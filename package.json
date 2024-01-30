@@ -17,5 +17,7 @@
   "devDependencies": {
     "dotenv": "^16.4.1",
     "nodemon": "^3.0.3"
-  }
+  },
+  "repository": "https://github.com/choobao/myResumeNote.git",
+  "author": "choobao <154485888+choobao@users.noreply.github.com>"
 }

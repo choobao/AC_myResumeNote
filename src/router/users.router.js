@@ -17,6 +17,8 @@ router.post("/sign-up", async (req, res, next) => {
     //중복이메일 검사
     if (isExistUser)
       return res.status(409).json({ message: "이미 존재하는 이메일 입니다." });
+    if (password.length < 6)
+      return res.status(400).json({ message: "비밀번호가 너무 짧습니다." });
 
     //비크립트 이용해 비밀번호 암호화해서 저장
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -48,7 +50,7 @@ router.post("/sign-up", async (req, res, next) => {
       }
     );
 
-    return res.status(201).json({ message: "회원가입이 완료되었습니다." });
+    return res.status(201).json({ data: [userInfo] });
   } catch (err) {
     next(err);
   }
