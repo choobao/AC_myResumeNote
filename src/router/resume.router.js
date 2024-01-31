@@ -41,6 +41,36 @@ router.get("/resumes", authMiddleWare, async (req, res, next) => {
   return res.status(201).json({ data: resumes });
 });
 
+//나의 이력서 상세 조회
+router.get("/resumes/:resumeId", authMiddleWare, async (req, res, next) => {
+  const { userId } = req.user;
+  const { resumeId } = req.params;
+
+  const myResume = await prisma.resumes.findFirst({
+    where: { resumeId: +resumeId },
+  });
+  if (!myResume)
+    return res
+      .status(404)
+      .json({ message: "사용자정보 또는 이력서 조회에 실패했습니다." });
+  const resume = await prisma.resumes.findFirst({
+    where: {
+      userId: +userId,
+      resumeId: +resumeId,
+    },
+    select: {
+      resumeId: true,
+      userId: true,
+      status: true,
+      title: true,
+      content: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+  return res.status(201).json({ data: resume });
+});
+
 //나의 이력서 정보 수정
 router.post("/resumes/:resumeId", authMiddleWare, async (req, res, next) => {
   const { userId } = req.user;
@@ -69,22 +99,5 @@ router.post("/resumes/:resumeId", authMiddleWare, async (req, res, next) => {
   return res
     .status(200)
     .json({ message: "이력서가 성공적으로 수정되었습니다." });
-  //이력서필드를 req정보를 바탕으로 업데이트, userID가 일치하는것 확인 두가지를 트랜잭션 사용
-  //   await prisma.$transaction(
-  //     async (tx) => {
-  //       await tx.resumes.update({
-  //         data: {
-  //             title, content
-  //         },
-  //         where: {
-  //           userId: +userId,
-
-  //         },
-  //       });
-  //     },
-  //     {
-  //       isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
-  //     }
-  //   );
 });
 export default router;
