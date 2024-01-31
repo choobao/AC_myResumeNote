@@ -1,6 +1,7 @@
 import express from "express";
 import authMiddleWare from "../middlewares/auth.middleware.js";
 import { prisma } from "../utils/prisma/index.js";
+import { Prisma } from "@prisma/client";
 
 const router = express.Router();
 
@@ -40,4 +41,50 @@ router.get("/resumes", authMiddleWare, async (req, res, next) => {
   return res.status(201).json({ data: resumes });
 });
 
+//나의 이력서 정보 수정
+router.post("/resumes/:resumeId", authMiddleWare, async (req, res, next) => {
+  const { userId } = req.user;
+  const { resumeId } = req.params;
+  const { title, content } = req.body;
+
+  //수정할 이력서 선택
+  const myResume = await prisma.resumes.findFirst({
+    where: { resumeId: +resumeId },
+  });
+  if (!myResume)
+    return res
+      .status(404)
+      .json({ message: "사용자정보 또는 이력서 조회에 실패했습니다." });
+
+  await prisma.resumes.update({
+    where: {
+      userId: +userId,
+      resumeId: +resumeId,
+    },
+    data: {
+      title: title,
+      content: content,
+    },
+  });
+  return res
+    .status(200)
+    .json({ message: "이력서가 성공적으로 수정되었습니다." });
+  //이력서필드를 req정보를 바탕으로 업데이트, userID가 일치하는것 확인 두가지를 트랜잭션 사용
+  //   await prisma.$transaction(
+  //     async (tx) => {
+  //       await tx.resumes.update({
+  //         data: {
+  //             title, content
+  //         },
+  //         where: {
+  //           userId: +userId,
+
+  //         },
+  //       });
+  //     },
+  //     {
+  //       isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+  //     }
+  //   );
+});
 export default router;
