@@ -12,6 +12,7 @@ export default async function (req, res, next) {
 
     if (tokenType !== "Bearer")
       throw new Error("토큰 타입이 Bearer 형식이 아닙니당");
+    //★jwt 유효기간이 지난경우 if문 구축(미완성)
 
     const decodedToken = jwt.verify(token, "custom-secret-key");
     const userId = decodedToken.userId;

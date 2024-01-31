@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import { prisma } from "../utils/prisma/index.js";
 import { Prisma } from "@prisma/client";
 import jwt from "jsonwebtoken";
+import authMiddleWare from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
@@ -78,12 +79,38 @@ router.post("/sign-in", async (req, res, next) => {
 
   //jwt는 header/payload/sign으로 이루어져있음
   const token = jwt.sign({ userId: user.userId }, "custom-secret-key", {
-    expiresIn: "12h",
+    expiresIn: "12hr",
   });
 
   //bearer token을 cookie에 할당
   res.cookie("authorization", `Bearer ${token}`);
   return res.status(200).json({ message: "로그인 성공~!" });
+});
+
+//내 정보조회 api
+router.get("/users", authMiddleWare, async (req, res, next) => {
+  const { userId } = req.user;
+
+  const user = await prisma.users.findFirst({
+    where: { userId: +userId },
+    select: {
+      userId: true,
+      email: true,
+      createdAt: true,
+      updatedAt: true,
+      userInfos: {
+        //중첩 select
+        select: {
+          name: true,
+          age: true,
+          gender: true,
+          profileImage: true,
+        },
+      },
+    },
+  });
+
+  return res.status(200).json({ data: user });
 });
 
 export default router;
