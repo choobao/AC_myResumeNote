@@ -7,17 +7,23 @@ const router = express.Router();
 
 //내 이력서 생성 api
 router.post("/resumes", authMiddleWare, async (req, res, next) => {
-  const { userId } = req.user;
-  const { title, content } = req.body; //status는 자동으로 apply로 등록
+  try {
+    const { userId, userInfoId } = req.user;
 
-  const resume = await prisma.resumes.create({
-    data: {
-      userId: +userId,
-      title: title,
-      content: content,
-    },
-  });
-  return res.status(201).json({ data: resume });
+    const { title, content } = req.body; //status는 자동으로 apply로 등록
+
+    const resume = await prisma.resumes.create({
+      data: {
+        userId: +userId,
+        userInfoId: +userInfoId,
+        title: title,
+        content: content,
+      },
+    });
+    return res.status(201).json({ data: resume });
+  } catch (err) {
+    next(err);
+  }
 });
 
 //나의 이력서 목록 조회
@@ -36,6 +42,35 @@ router.get("/resumes", authMiddleWare, async (req, res, next) => {
     },
     orderBy: {
       createdAt: "desc",
+    },
+  });
+  return res.status(201).json({ data: resumes });
+});
+
+//모든 이력서 목록 조회
+router.get("/resumes", async (req, res, next) => {
+  const { orderKey, orderValue } = req.query;
+
+  const Value = orderValue.toLowerCase() === "asc" ? "asc" : "desc";
+
+  const resumes = await prisma.resumes.findMany({
+    where: { userId: +orderKey },
+    select: {
+      userId: true,
+      resumeId: true,
+      status: true,
+      title: true,
+      createdAt: true,
+      updatedAt: true,
+      userInfos: {
+        select: {
+          name: true,
+        },
+      },
+      //상세조회에서 content 조회가능하도록
+    },
+    orderBy: {
+      createdAt: Value,
     },
   });
   return res.status(201).json({ data: resumes });
@@ -99,5 +134,34 @@ router.post("/resumes/:resumeId", authMiddleWare, async (req, res, next) => {
   return res
     .status(200)
     .json({ message: "이력서가 성공적으로 수정되었습니다." });
+});
+
+//나의 이력서 정보 삭제
+router.delete("/resumes/:resumeId", authMiddleWare, async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { resumeId } = req.params;
+
+    //삭제할 이력서 선택
+    const myResume = await prisma.resumes.findFirst({
+      where: { resumeId: +resumeId },
+    });
+    if (!myResume)
+      return res
+        .status(404)
+        .json({ message: "사용자정보 또는 이력서 조회에 실패했습니다." });
+
+    await prisma.resumes.delete({
+      where: {
+        userId: +userId,
+        resumeId: +resumeId,
+      },
+    });
+    return res
+      .status(200)
+      .json({ message: "이력서가 성공적으로 삭제되었습니다." });
+  } catch (err) {
+    next(err);
+  }
 });
 export default router;

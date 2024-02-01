@@ -10,7 +10,8 @@ const router = express.Router();
 //회원가입 api
 router.post("/sign-up", async (req, res, next) => {
   try {
-    const { email, password, name, age, gender, profileImage } = req.body;
+    const { email, password, passwordCheck, name, age, gender, profileImage } =
+      req.body;
 
     const isExistUser = await prisma.users.findFirst({
       where: { email },
@@ -19,6 +20,10 @@ router.post("/sign-up", async (req, res, next) => {
     //중복이메일 검사
     if (isExistUser)
       return res.status(409).json({ message: "이미 존재하는 이메일 입니다." });
+    if (password !== passwordCheck)
+      return res
+        .status(400)
+        .json({ message: "입력하신 비밀번호를 다시 확인해주십시오." });
     if (password.length < 6)
       return res.status(400).json({ message: "비밀번호가 너무 짧습니다." });
 
@@ -52,7 +57,9 @@ router.post("/sign-up", async (req, res, next) => {
       }
     );
 
-    return res.status(201).json({ data: [userInfo] });
+    return res
+      .status(201)
+      .json({ message: "회원가입을 축하드립니다.", data: [userInfo] });
   } catch (err) {
     next(err);
   }
@@ -66,26 +73,60 @@ router.post("/sign-up", async (req, res, next) => {
 //         - Payload: userId를 담고 있습니다.
 //         - 유효기한: 12시간
 router.post("/sign-in", async (req, res, next) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const user = await prisma.users.findFirst({ where: { email } });
+    const user = await prisma.users.findFirst({ where: { email } });
 
-  if (!user)
-    //일치하는 users가 존재하지 않음
-    return res.status(401).json({ message: "존재하지 않는 이메일입니다." });
-  if (!(await bcrypt.compare(password, user.password)))
-    //users.password값을 비크립트로 비교했는데 비밀번호 일치하지않음
-    return res.status(401).json({ message: "비밀번호가 일치하지 않습니다." });
+    if (!user)
+      //일치하는 users가 존재하지 않음
+      return res.status(401).json({ message: "존재하지 않는 이메일입니다." });
+    if (!(await bcrypt.compare(password, user.password)))
+      //users.password값을 비크립트로 비교했는데 비밀번호 일치하지않음
+      return res.status(401).json({ message: "비밀번호가 일치하지 않습니다." });
 
-  //jwt는 header/payload/sign으로 이루어져있음
-  const token = jwt.sign({ userId: user.userId }, "custom-secret-key", {
-    expiresIn: "12hr",
-  });
+    //jwt는 header/payload/sign으로 이루어져있음
+    const accessToken = jwt.sign({ userId: user.userId }, "custom-secret-key", {
+      expiresIn: "12h",
+    });
+    const refreshToken = jwt.sign(
+      { userId: user.userId },
+      "custom-secret-key",
+      {
+        expiresIn: "7d",
+      }
+    );
 
-  //bearer token을 cookie에 할당
-  res.cookie("authorization", `Bearer ${token}`);
-  return res.status(200).json({ message: "로그인 성공~!" });
+    //bearer token을 cookie에 할당
+    res.cookie("authorization", `Bearer ${accessToken}`);
+    res.cookie("refreshToken", `Bearer ${refreshToken}`);
+    return res.status(200).json({ message: "로그인 성공~!" });
+  } catch (err) {
+    next(err);
+  }
 });
+
+// //엑세스토큰 재발급 받기
+// router.post("/refreshToken", async (req, res, next) => {
+//   try {
+//     const { refreshToken } = req.cookies;
+
+//     if (!refreshToken) throw new Error("리프레시토큰이 존재하지 않습니다.");
+
+//     const [tokenType, token] = refreshToken.split(" ");
+//     //리프레시토큰이 맞으면 엑세스토큰 쿠키로 새로 넣어주기
+//     if (tokenType !== "Bearer")
+//       throw new Error("토큰 타입이 Bearer 형식이 아닙니당");
+
+//     const decodedToken = jwt.verify(token, "custom-secret-key");
+//     console.log(decodedToken);
+//   } catch (err) {
+//     if ((err.name = "jwt expired"))
+//       return res.status(401).json({ message: "토큰이 만료되었습니다." });
+
+//     return res.status(400).json({ message: err.message });
+//   }
+// });
 
 //내 정보조회 api
 router.get("/users", authMiddleWare, async (req, res, next) => {

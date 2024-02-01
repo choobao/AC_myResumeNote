@@ -28,12 +28,14 @@ model Resumes {
   resumeId Int @id @default(autoincrement()) @map("resumeId") 
   status Status @default(APPLY) @map("status")
   userId Int @map("userId")
+  userInfoId Int @map("userInfoId") 
   title String @map("title")
   content String @map("content") @db.Text
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
 
   user Users @relation(fields:[userId], references: [userId], onDelete:Cascade)
+  userInfos UserInfos @relation(fields:[userInfoId], references: [userInfoId], onDelete:Cascade)
 
   @@map("Resumes")
 }
@@ -59,6 +61,8 @@ model UserInfos {
   updatedAt DateTime @updatedAt @map("updatedAt")
   
   user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  resumeId Resumes[] //userInfos와 resumes 필드는 1:N관계를 가진다
 
   @@map("UserInfos")
 }
