@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import UsersRouter from "./router/users.router.js";
 import errorMiddleware from "./middlewares/error.handling.middleware.js";
 import ResumeRouter from "./router/resume.router.js";
+import kakaoLogin from "./router/kakaoLogin.js";
 
 dotenv.config(); //process.env.(변수이름)
 
@@ -12,7 +13,7 @@ const PORT = 3018;
 
 app.use(express.json());
 app.use(cookieParser());
-app.use("/api", [UsersRouter, ResumeRouter]);
+app.use("/api", [kakaoLogin, UsersRouter, ResumeRouter]);
 
 app.use(errorMiddleware);
 

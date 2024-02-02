@@ -4,6 +4,9 @@ import { prisma } from "../utils/prisma/index.js";
 import { Prisma } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import authMiddleWare from "../middlewares/auth.middleware.js";
+// import dotenv from "dotenv";
+// import qs from "qs";
+// import axios from "axios";
 
 const router = express.Router();
 
@@ -153,5 +156,49 @@ router.get("/users", authMiddleWare, async (req, res, next) => {
 
   return res.status(200).json({ data: user });
 });
+
+// router.get("/kakao", (req, res, next) => {
+//   const kakaoLoginURL = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.CLIENT_ID}&redirect_uri=${process.env.REDIRECT_URL}&response_type=code`;
+
+//   return res.redirect(kakaoLoginURL);
+// });
+
+// router.get("/kakao/callback", async (req, res) => {
+//   const code = req.query.code;
+//   const tokenRequest = await axios({
+//     method: "POST",
+//     url: "https://kauth.kakao.com/oauth/token",
+//     headers: {
+//       "content-type": "application/x-www-form-urlencoded",
+//     },
+//     data: {
+//       grant_type: "authorization_code",
+//       client_id: process.env.CLIENT_ID,
+//       redirect_uri: process.env.REDIRECT_URL,
+//       code,
+//     },
+//   });
+//   const { access_token } = tokenRequest.data;
+//   const profileRequest = await axios({
+//     method: "GET",
+//     url: "https://kapi.kakao.com/v2/user/me",
+//     headers: {
+//       Authorization: `Bearer ${access_token}`,
+//     },
+//   });
+//   const { email, profile } = profileRequest.data.kakao_account;
+//   const name = profile.nickname;
+//   const users = await prisma.users.upsert({
+//     where: { email },
+//     update: { email },
+//     create: { email, password: "default" },
+//   });
+//   const userJWT = jwt.sign(
+//     { userId: users.id },
+//     process.env.SESSION_SECRET_KEY
+//   );
+//   res.cookie("authorization", `Bearer ${userJWT}`);
+//   return res.status(200).json({ message: "로그인 성공" });
+// });
 
 export default router;
