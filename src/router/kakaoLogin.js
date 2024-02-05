@@ -23,6 +23,7 @@ router.get("/kakao", async (req, res, next) => {
 //2. post/인가코드 보내서 토큰받기
 router.get("/kakao/callback", async (req, res, next) => {
   const code = req.query.code;
+  console.log(code);
   //   console.log("인가코드:", code); //인가코드가 담겨있음
 
   const tokenRequest = await axios.post(
@@ -44,6 +45,7 @@ router.get("/kakao/callback", async (req, res, next) => {
 
   //3. 카카오사용자 이름, 이메일 통해 prisma users 안에 정보 저장하고 인증쿠키 발행하기
   const { access_token } = tokenRequest.data;
+  console.log(access_token);
   const profileRequest = await axios({
     method: "GET",
     url: "https://kapi.kakao.com/v2/user/me",
@@ -76,6 +78,12 @@ router.get("/kakao/callback", async (req, res, next) => {
   //   console.log("사용자정보:", getData.data);
 
   return res.status(200).json({ message: "로그인 성공" });
+});
+
+router.get("/kakao/logout", async (req, res, next) => {
+  const kakaoLoginout = `https://kauth.kakao.com/oauth/logout?client_id=${process.env.CLIENT_ID}&logout_redirect_uri=http://localhost:3018/api/kakao/logout/callback`;
+
+  return res.redirect(kakaoLoginout);
 });
 
 export default router;
