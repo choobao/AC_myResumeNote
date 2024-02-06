@@ -98,7 +98,7 @@ router.post("/sign-in", async (req, res, next) => {
     //bearer token을 cookie에 할당
     res.cookie("authorization", `Bearer ${accessToken}`);
     res.cookie("refreshToken", `Bearer ${refreshToken}`);
-    return res.status(422).json({ message: "로그인 성공~!" });
+    return res.status(201).json({ message: "로그인 성공~!" });
   } catch (err) {
     next(err);
   }
