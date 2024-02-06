@@ -18,9 +18,11 @@ const router = express.Router();
 // //  EnmTbf4vrow68BmqehsT1RPzCUFe8iKW 클라이언트 secret key
 
 // // 1. get/카카오로그인 페이지 연결
-// router.get("/kakao", async (req, res, next) => {
-//   const kakaoLoginURL = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.CLIENT_ID}&redirect_uri=${process.env.REDIRECT_URL}&response_type=code`;
-//   console.log(kakaoLoginURL);
+router.get("/kakao", async (req, res, next) => {
+  const kakaoLoginURL = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.CLIENT_ID}&redirect_uri=${process.env.REDIRECT_URL}&response_type=code`;
+  console.log(kakaoLoginURL);
+  return res.redirect(kakaoLoginURL);
+});
 
 //   useEffect(() => {
 //     fetch("data/allGroup.json", {
