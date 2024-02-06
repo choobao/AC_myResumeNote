@@ -50,12 +50,14 @@ router.get("/resumes", authMiddleWare, async (req, res, next) => {
 //모든 이력서 목록 조회
 router.get("/resumes", async (req, res, next) => {
   const { orderKey, orderValue } = req.query;
+  console.log(req.query);
+  console.log(req.query.orderKey);
 
   const Value = orderValue.toLowerCase() === "asc" ? "asc" : "desc";
 
   const resumes = await prisma.resumes.findMany({
     where: { userId: +orderKey },
-    select: {
+    include: {
       userId: true,
       resumeId: true,
       status: true,
@@ -93,7 +95,7 @@ router.get("/resumes/:resumeId", authMiddleWare, async (req, res, next) => {
       userId: +userId,
       resumeId: +resumeId,
     },
-    select: {
+    include: {
       resumeId: true,
       userId: true,
       status: true,
@@ -101,6 +103,11 @@ router.get("/resumes/:resumeId", authMiddleWare, async (req, res, next) => {
       content: true,
       createdAt: true,
       updatedAt: true,
+      Users: {
+        select: {
+          email: true,
+        },
+      },
     },
   });
   return res.status(201).json({ data: resume });

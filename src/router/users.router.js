@@ -4,9 +4,12 @@ import { prisma } from "../utils/prisma/index.js";
 import { Prisma } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import authMiddleWare from "../middlewares/auth.middleware.js";
-// import dotenv from "dotenv";
+import dotenv from "dotenv";
+import JWT from "../utils/jwt.sign.js";
 // import qs from "qs";
 // import axios from "axios";
+
+dotenv.config(); //process.env.(변수이름)
 
 const router = express.Router();
 
@@ -57,7 +60,7 @@ router.post("/sign-up", async (req, res, next) => {
       {
         //격리레벨설정하기 : readCommitted
         isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
-      }
+      },
     );
 
     return res
@@ -89,21 +92,13 @@ router.post("/sign-in", async (req, res, next) => {
       return res.status(401).json({ message: "비밀번호가 일치하지 않습니다." });
 
     //jwt는 header/payload/sign으로 이루어져있음
-    const accessToken = jwt.sign({ userId: user.userId }, "custom-secret-key", {
-      expiresIn: "12h",
-    });
-    const refreshToken = jwt.sign(
-      { userId: user.userId },
-      "custom-secret-key",
-      {
-        expiresIn: "7d",
-      }
-    );
-
+    const accessToken = JWT(user, "12h");
+    const refreshToken = JWT(user, "7d");
+    console.log(accessToken);
     //bearer token을 cookie에 할당
     res.cookie("authorization", `Bearer ${accessToken}`);
     res.cookie("refreshToken", `Bearer ${refreshToken}`);
-    return res.status(200).json({ message: "로그인 성공~!" });
+    return res.status(422).json({ message: "로그인 성공~!" });
   } catch (err) {
     next(err);
   }
