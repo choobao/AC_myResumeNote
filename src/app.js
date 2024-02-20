@@ -1,10 +1,10 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-import UsersRouter from "./router/users.router.js";
+import UsersRouter from "./routes/users.router.js";
 import errorMiddleware from "./middlewares/error.handling.middleware.js";
-import ResumeRouter from "./router/resume.router.js";
-import kakaoLogin from "./router/kakaoLogin.js";
+import ResumeRouter from "./routes/index.js";
+import kakaoLogin from "./routes/kakaoLogin.js";
 
 dotenv.config(); //process.env.(변수이름)
 

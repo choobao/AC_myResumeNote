@@ -1,11 +1,9 @@
 import express from "express";
 import { prisma } from "../utils/prisma/index.js";
-import { Prisma } from "@prisma/client";
 import dotenv from "dotenv";
-import qs from "qs";
-import cookieParser from "cookie-parser";
 import axios from "axios";
 import jwt from "jsonwebtoken";
+import { PostsController } from "../controllers/controller.js";
 
 dotenv.config(); //process.env.
 
@@ -41,7 +39,6 @@ router.get("/kakao/callback", async (req, res, next) => {
       },
     },
   );
-  //   console.log("토큰데이터:", tokenRequest.data);
 
   //3. 카카오사용자 이름, 이메일 통해 prisma users 안에 정보 저장하고 인증쿠키 발행하기
   const { access_token } = tokenRequest.data;
@@ -67,15 +64,6 @@ router.get("/kakao/callback", async (req, res, next) => {
     process.env.SESSION_SECRET_KEY,
   );
   res.cookie("authorization", `Bearer ${userJWT}`);
-
-  //   //엑세스 토큰 이용해 사용자 정보 가져오기
-  //   const getData = await axios.post("https://kapi.kakao.com/v2/user/me", {
-  //     headers: {
-  //       "content-type": "application/x-www-form-urlencoded;charset=utf-8",
-  //       Authorization: `Bearer ${tokenRequest.data.access_token}`,
-  //     },
-  //   });
-  //   console.log("사용자정보:", getData.data);
 
   return res.status(200).json({ message: "로그인 성공" });
 });
