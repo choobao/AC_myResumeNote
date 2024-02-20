@@ -24,7 +24,7 @@ export class PostsController {
   //모든 이력서 목록 조회
   getAllResume = async (req, res, next) => {
     try {
-      const resumes = await this.postsService.findAllresumes();
+      const resumes = await this.postsService.findAllResumes();
 
       return res.status(200).json({ data: resumes });
     } catch (err) {
@@ -48,17 +48,30 @@ export class PostsController {
   //나의 이력서 목록 조회
   getMyAllResume = async (req, res, next) => {
     try {
-      const resumeId = req.params;
+      const { userId } = req.user;
 
-      return res.status(200).json({ data: posts });
+      const resumes = await this.postsService.findResumeByid(userId);
+
+      return res.status(200).json({ data: resumes });
     } catch (err) {
       next(err);
     }
   };
 
+  //나의 이력서 정보 수정
   postMyResume = async (req, res, next) => {
     try {
-      return res.status(200).json({ data: posts });
+      const { userId } = req.user;
+      const { resumeId } = req.params;
+      const { title, content } = req.body;
+
+      const resume = await this.postsService.updateResume(
+        userId,
+        resumeId,
+        title,
+        content,
+      );
+      return res.status(201).json({ data: resume });
     } catch (err) {
       next(err);
     }
@@ -66,38 +79,13 @@ export class PostsController {
 
   deleteMyResume = async (req, res, next) => {
     try {
-      return res.status(200).json({ data: posts });
+      const { userId } = req.user;
+      const { resumeId } = req.params;
+
+      const resume = await this.postsService.deleteResume(userId, resumeId);
+      return res.status(201).json({ data: resume });
     } catch (err) {
       next(err);
     }
   };
-
-  //   getPosts = async (req, res, next) => {
-  //     try {
-  //       // 서비스 계층에 구현된 findAllPosts 로직을 실행합니다.
-  //       const posts = await this.postsService.findAllPosts();
-
-  //       return res.status(200).json({ data: posts });
-  //     } catch (err) {
-  //       next(err);
-  //     }
-  //   };
-
-  //   createPost = async (req, res, next) => {
-  //     try {
-  //       const { nickname, password, title, content } = req.body;
-
-  //       // 서비스 계층에 구현된 createPost 로직을 실행합니다.
-  //       const createdPost = await this.postsService.createPost(
-  //         nickname,
-  //         password,
-  //         title,
-  //         content,
-  //       );
-
-  //       return res.status(201).json({ data: createdPost });
-  //     } catch (err) {
-  //       next(err);
-  //     }
-  //   };
 }

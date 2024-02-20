@@ -7,7 +7,6 @@ dotenv.config(); //process.env.(변수이름)
 export default async function (req, res, next) {
   try {
     const { authorization } = req.cookies;
-    console.log(authorization);
 
     if (!authorization)
       throw new Error("요청한 사용자의 토큰이 존재하지 않습니다.");

@@ -13,15 +13,15 @@ router.post("/", authMiddleWare, postsController.createResume);
 router.get("/", postsController.getAllResume);
 
 //나의 이력서 목록 조회
-router.get("/", authMiddleWare, postsController.getMyAllResume);
+router.get("/my", authMiddleWare, postsController.getMyAllResume);
 
 //나의 이력서 상세 조회
-router.get("/:resumeId", authMiddleWare, postsController.getMyResume);
+router.get("/my/:resumeId", authMiddleWare, postsController.getMyResume);
 
 //나의 이력서 정보 수정
-router.post("/:resumeId", authMiddleWare, postsController.postMyResume);
+router.post("/my/:resumeId", authMiddleWare, postsController.postMyResume);
 
 //나의 이력서 정보 삭제
-router.delete("/:resumeId", authMiddleWare, postsController.deleteMyResume);
+router.delete("/my/:resumeId", authMiddleWare, postsController.deleteMyResume);
 
 export default router;
