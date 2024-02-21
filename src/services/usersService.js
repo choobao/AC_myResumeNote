@@ -3,11 +3,11 @@ import bcrypt from "bcrypt";
 import JWT from "../utils/jwt.sign.js";
 
 export class UsersService {
-  // usersRepository = new UsersRepository();
+  usersRepository = new UsersRepository();
 
-  constructor(usersRepository) {
-    this.usersRepository = usersRepository;
-  }
+  // constructor(usersRepository) {
+  //   this.usersRepository = usersRepository;
+  // }
   checkExistingUser = async (email) => {
     const isExistUser = await this.usersRepository.checkExistingUser(email);
     return isExistUser;

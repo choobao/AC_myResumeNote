@@ -1,11 +1,11 @@
 import { PostRepository } from "../repositories/repository.js";
 
 export class PostsService {
-  // postRepository = new PostRepository();
+  postRepository = new PostRepository();
 
-  constructor(postRepository) {
-    this.postRepository = postRepository;
-  }
+  // constructor(postRepository) {
+  //   this.postRepository = postRepository;
+  // }
   //이력서 생성
   createPost = async (userId, userInfoId, title, content) => {
     const resumes = await this.postRepository.createPost(

@@ -1,10 +1,10 @@
 import { UsersService } from "../services/usersService.js";
 
 export class UsersController {
-  // usersService = new UsersService();
-  constructor(usersService) {
-    this.usersService = usersService;
-  }
+  usersService = new UsersService();
+  // constructor(usersService) {
+  //   this.usersService = usersService;
+  // }
 
   signUp = async (req, res, next) => {
     try {

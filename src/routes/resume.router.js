@@ -8,11 +8,11 @@ import { PostRepository } from "../repositories/repository.js";
 const router = express.Router();
 
 //의존성 주입 작업
-const postRepository = new PostRepository(prisma);
-const postService = new PostsService(postRepository);
-const postsController = new PostsController(postService);
+// const postRepository = new PostRepository(prisma);
+// const postService = new PostsService(postRepository);
+// const postsController = new PostsController(postService);
 
-// const postsController = new PostsController();
+const postsController = new PostsController();
 
 //내 이력서 생성 api
 router.post("/", authMiddleWare, postsController.createResume);

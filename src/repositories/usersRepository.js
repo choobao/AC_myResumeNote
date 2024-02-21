@@ -1,13 +1,13 @@
-// import { prisma } from "../utils/prisma/index.js";
+import { prisma } from "../utils/prisma/index.js";
 import { Prisma } from "@prisma/client";
 
 export class UsersRepository {
-  constructor(prisma) {
-    this.prisma = prisma;
-  }
+  // constructor(prisma) {
+  //   this.prisma = prisma;
+  // }
 
   checkExistingUser = async (email) => {
-    const isExistUser = await this.prisma.users.findFirst({
+    const isExistUser = await prisma.users.findFirst({
       where: { email },
     });
     return isExistUser;
@@ -21,7 +21,7 @@ export class UsersRepository {
     gender,
     profileImage,
   ) => {
-    const [user, userInfo] = await this.prisma.$transaction(
+    const [user, userInfo] = await prisma.$transaction(
       async (tx) => {
         const createdUser = await tx.users.create({
           data: {
@@ -51,11 +51,11 @@ export class UsersRepository {
   };
 
   userInfo = async ({ userId }) => {
-    const user = await this.prisma.users.findFirst({
+    const user = await prisma.users.findFirst({
       where: { userId: +userId },
     });
 
-    const userInfo = await this.prisma.userInfos.findFirst({
+    const userInfo = await prisma.userInfos.findFirst({
       where: { userId: +userId },
     });
     return [user, userInfo];
