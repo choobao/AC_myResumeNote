@@ -1,5 +1,3 @@
-// import { prisma } from "../utils/prisma/index.js";
-
 export class PostRepository {
   constructor(prisma) {
     this.prisma = prisma;
