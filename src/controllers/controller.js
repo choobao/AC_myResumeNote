@@ -2,7 +2,11 @@ import { PostsService } from "../services/service.js";
 
 // Post의 컨트롤러(Controller)역할을 하는 클래스
 export class PostsController {
-  postsService = new PostsService(); // Post 서비스를 클래스를 컨트롤러 클래스의 멤버 변수로 할당합니다.
+  // postsService = new PostsService(); // Post 서비스를 클래스를 컨트롤러 클래스의 멤버 변수로 할당합니다.
+
+  constructor(postsService) {
+    this.postsService = postsService;
+  }
 
   createResume = async (req, res, next) => {
     try {
