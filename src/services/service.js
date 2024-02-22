@@ -68,7 +68,7 @@ export class PostsService {
   //나의 이력서 목록 조회
   findResumeByid = async (userId) => {
     const resumes = await this.postRepository.findResumeByid(userId);
-    console.log(userId);
+
     return {
       userId: +resumes.userId,
       userInfoId: +resumes.userInfoId,
